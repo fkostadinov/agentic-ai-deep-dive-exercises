@@ -292,15 +292,3 @@ The main difference is that the agent now:
 * operates over time
 * adapts based on context
 * decides when to act vs. when to guide
-
----
-
-## What’s next
-
-In the next exercise, you will extend your agent further by adding:
-
-* **tool usage (function calling)**
-* interaction with external logic
-* more autonomous behavior
-
----

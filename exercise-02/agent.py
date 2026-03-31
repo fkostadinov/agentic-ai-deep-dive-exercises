@@ -71,7 +71,7 @@ def print_agent_response(result):
 
 def run_agent_loop(history):
     """
-    YOUR TASK - IMPLEMENT THIS FUNCTION!
+    EXERCISE TASK - IMPLEMENT THIS FUNCTION!
 
     1. Implement the agent loop as a while loop.
 
@@ -110,7 +110,7 @@ def run_agent_loop(history):
        pretty print the entire messages history as JSON:
        print(json.dumps(history, indent=2, ensure_ascii=False))
     """
-    
+
     pass
 
 
