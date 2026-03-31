@@ -1,7 +1,3 @@
-Here is a clean, workshop-ready `README.md` for Exercise 01. It is written to be clear for participants but also sets up your later exercises.
-
----
-
 # Exercise 01 – Build a Simple CLI Agent (from Scratch)
 
 ## Goal of this exercise
