@@ -57,12 +57,15 @@ def call_model(user_goal: str) -> dict[str, Any]:
 
     data = response.json()
 
+    # To print the server's JSON response, uncomment the following lines:
+    """
     print()
     print("-" * 40)
     print("Server response:")
     print(json.dumps(data, indent=2))
     print("-" * 40)
     print()
+    """
 
     content = data["choices"][0]["message"]["content"]
 
