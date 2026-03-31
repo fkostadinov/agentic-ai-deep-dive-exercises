@@ -225,15 +225,3 @@ At its core, it is simply:
 > A loop that sends structured input to a model and turns the output into actionable steps.
 
 Everything else (tools, memory, multi-agent systems) builds on top of this.
-
----
-
-## What’s next
-
-In Exercise 02, you will extend this into a **stateful agent** that:
-
-* runs in a loop
-* remembers previous interactions
-* allows iterative refinement
-
----
