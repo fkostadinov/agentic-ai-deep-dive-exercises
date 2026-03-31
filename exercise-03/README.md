@@ -1,16 +1,19 @@
-# Exercise 02 – Build a Stateful CLI Agent (with SDK)
+# Exercise 03 – Build a Tool-Using CLI Agent
 
 ## Goal of this exercise
 
-In this exercise, you will extend your agent from Exercise 01 into a **stateful conversational agent**.
+In this exercise, you will extend your agent so that it can **use tools (i.e. Python functions)** to perform real actions.
 
-Instead of responding once, your agent will now:
+Until now, your agent could:
 
-* run in a loop
-* remember previous interactions
-* decide whether to **answer immediately** or **guide the user step-by-step**
+* respond with text (Exercise 01)
+* maintain memory and context (Exercise 02)
 
-You will also replace raw HTTP calls with the **OpenAI SDK**, which simplifies interaction with the model.
+Now it will:
+
+* **decide when to call a tool**
+* **execute Python code**
+* **use the result to produce a final answer**
 
 ---
 
@@ -18,72 +21,105 @@ You will also replace raw HTTP calls with the **OpenAI SDK**, which simplifies i
 
 By the end of this exercise, you will understand:
 
-* How to build a **stateful agent loop**
-* How to manage **conversation history (memory)**
-* When an agent should **act immediately vs. plan**
-* How an SDK simplifies API usage compared to raw HTTP
-* How structured outputs guide agent behavior
+* What **tool use** means in agent systems
+* How to represent tools as **plain Python functions**
+* How an agent decides between:
+
+  * answering directly
+  * calling a tool
+* The **two-step interaction pattern**:
+
+  1. decide what to do
+  2. produce final response after action
+* How tools make agents **more reliable and useful**
 
 ---
 
 ## What you will build
 
-You will build a command-line agent that:
+You will build a CLI agent that can:
 
-* accepts user input continuously
-* keeps conversation context across turns
-* decides between:
-
-  * answering directly (e.g. “tell me a joke”)
-  * asking follow-up questions or refining a plan
-* supports basic commands like `reset`, `history`, and `exit`
+* answer simple questions directly
+* call tools when needed
+* execute Python functions
+* return a final user-facing response
 
 ---
 
-## Example interaction
+## Example interactions
 
 ```text
-You: Tell me a joke
+You: What time is it?
 
 Agent:
-Why do programmers prefer dark mode? Because light attracts bugs.
+The current time is 2026-03-31 14:32:10.
 ```
 
 ```text
-You: Help me prepare a workshop on AI agents
+You: Calculate 17 * 23 + 4
 
 Agent:
-A good starting point is to define the target audience and learning objectives.
+The result is 395.
+```
 
-Plan:
-1. Define the audience
-2. Choose key topics
-3. Draft the agenda
+```text
+You: Save a note saying buy milk and eggs
 
-Next action:
-Tell me who the workshop is for and how long it should be.
+Agent:
+Your note has been saved.
 ```
 
 ---
 
-## Key concept: Answer vs. Follow-up
+## Key concept: Tools
 
-In Exercise 01, your agent always planned first.
+A tool is simply:
 
-In this exercise, the agent must decide:
+> A Python function that the agent can decide to call
 
-* **Answer mode** → do the task immediately
-* **Follow-up mode** → guide the user through multiple steps
+Example:
 
-This is a key step toward building realistic agents.
+```python
+def get_current_time():
+    ...
+```
+
+The agent does not execute code directly.
+Instead, it:
+
+1. decides which tool to use
+2. provides inputs
+3. your program executes the tool
+4. the result is sent back to the model
+
+---
+
+## Key concept: Two-step agent pattern
+
+Tool use typically follows this pattern:
+
+1. **Decision step**
+
+   * Model decides: answer or tool call
+
+2. **Execution step**
+
+   * Python executes the tool
+
+3. **Final response**
+
+   * Model generates a user-friendly reply using the tool result
+
+This separation is fundamental to most real-world agents.
 
 ---
 
 ## Project structure
 
 ```text
-exercise-02-stateful-agent/
+exercise-03-tool-agent/
 ├── agent.py
+├── tools.py
 ├── requirements.txt
 └── .env.example
 ```
@@ -126,7 +162,7 @@ Copy:
 cp .env.example .env
 ```
 
-Fill in:
+Then fill in:
 
 ```env
 FOUNDRY_ENDPOINT=...
@@ -144,29 +180,32 @@ python agent.py
 
 ---
 
-## Commands
+## Available tools
 
-The agent supports:
+Your agent can use the following tools:
 
-* `exit` / `quit` → stop the program
-* `reset` → clear memory
-* `history` → print conversation history
+* `get_current_time()`
+* `calculate(expression)`
+* `save_note(text)`
+
+These are implemented in `tools.py`.
 
 ---
 
-## How it works (conceptually)
+## How it works (high level)
 
-The agent loop looks like this:
+Each user request follows this flow:
 
-1. Read user input
-2. Append it to message history
-3. Send full history to the model
-4. Receive structured JSON response
-5. Print result
-6. Append response to history
-7. Repeat
+1. User input
+2. Model decides:
 
-The “memory” is simply the list of messages.
+   * `"answer"` → respond directly
+   * `"tool_call"` → call a tool
+3. If tool is used:
+
+   * Python executes the function
+   * Result is sent back to the model
+4. Model produces final response
 
 ---
 
@@ -174,133 +213,99 @@ The “memory” is simply the list of messages.
 
 ### Task 1 – Run the agent
 
-Verify that the agent works across multiple turns.
+Verify that:
+
+* normal questions are answered directly
+* tool-based questions trigger tool usage
 
 ---
 
-### Task 2 – Test both modes
+### Task 2 – Test all tools
+
+Try at least one example per tool:
+
+```text
+What time is it?
+Calculate 144 / 12 + 7
+Save a note saying call Alice tomorrow
+```
+
+---
+
+### Task 3 – Inspect the decision step
+
+Print the model decision before execution:
+
+```python
+print(json.dumps(decision, indent=2))
+```
+
+Look at:
+
+* `mode`
+* `tool_name`
+* `tool_input`
+
+---
+
+### Task 4 – Trace the full flow
+
+Understand the sequence:
+
+```text
+User → Model (decision) → Tool → Model (final answer)
+```
+
+---
+
+### Task 5 – Modify behavior
 
 Try:
 
-* A simple request:
-
-  ```text
-  Tell me a joke
-  ```
-* A complex task:
-
-  ```text
-  Help me design a training on AI agents
-  ```
-
-Observe the difference in behavior.
+* Make the agent prefer tools more aggressively
+* Add stricter validation for tool inputs
+* Change how results are presented
 
 ---
 
-### Task 3 – Inspect memory
+## Important concept: Tools vs. LLM
 
-Use:
+Language models are good at:
 
-```text
-history
-```
+* reasoning
+* generating text
 
-Look at how messages are stored and passed to the model.
+Tools are good at:
 
----
+* precise computation
+* accessing real data
+* performing actions
 
-### Task 4 – Refine a task over time
-
-Example:
-
-```text
-I want to prepare a workshop on AI agents
-Make it more technical
-Add a section on security
-```
-
-Observe how the plan evolves.
-
----
-
-### Task 5 – Reset state
-
-Use:
-
-```text
-reset
-```
-
-Confirm that the agent forgets previous context.
-
----
-
-## Important concept: Memory
-
-The agent does not “remember” magically.
-
-Its memory is explicitly managed as:
-
-* a list of messages
-* sent to the model on every request
-
-This is the foundation for more advanced memory systems later.
-
----
-
-## Important concept: SDK vs. raw HTTP
-
-In Exercise 01, you:
-
-* manually built HTTP requests
-
-In Exercise 02, you:
-
-* use an SDK (`openai`)
-
-The underlying logic is the same — the SDK simply abstracts:
-
-* request construction
-* authentication
-* response handling
+Combining both gives you much more powerful systems.
 
 ---
 
 ## Optional challenges
 
-If you finish early, try:
+If you finish early, try one of these:
 
-* Limit history to the last N turns
-* Add a `help` command
-* Save conversations to a file
-* Print both raw and parsed responses
-* Add timestamps to messages
+* Add a new tool:
+
+  * `read_notes()`
+  * `clear_notes()`
+* Log every tool call to a file
+* Prevent duplicate notes
+* Add confirmation before saving notes
+* Add a fake weather tool
 
 ---
 
 ## Key takeaway
 
-A stateful agent is still built from simple components:
+An agent becomes truly useful when it can:
 
-* input
-* memory (message history)
-* model call
-* structured output
+* reason (LLM)
+* act (tools)
+* iterate (loop + memory)
 
-The main difference is that the agent now:
-
-* operates over time
-* adapts based on context
-* decides when to act vs. when to guide
-
----
-
-## What’s next
-
-In the next exercise, you will extend your agent further by adding:
-
-* **tool usage (function calling)**
-* interaction with external logic
-* more autonomous behavior
-
----
+This exercise combines all three.

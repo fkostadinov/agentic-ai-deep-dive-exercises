@@ -11,6 +11,8 @@ def calculate(expression: str) -> str:
         raise ValueError("Expression contains invalid characters.")
 
     try:
+        # BEWARE: THIS CODE ALLOWS EXECUTION OF ALMOST ANY COMMAND ON YOUR
+        # COMPUTER! THIS IS FOR EDUCATIONAL PURPOSES ONLY!
         result = eval(expression, {"__builtins__": {}}, {})
     except Exception as e:
         raise ValueError(f"Could not calculate expression: {e}")
