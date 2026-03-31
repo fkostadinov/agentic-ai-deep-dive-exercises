@@ -122,7 +122,7 @@ def run_agent_loop(history):
             break
 
         if user_input.lower() == "reset":
-            history = [{"role": "system", "content": SYSTEM_PROMPT}]
+            history[:] = [{"role": "system", "content": SYSTEM_PROMPT}]
             print("Memory cleared.")
             continue
 
