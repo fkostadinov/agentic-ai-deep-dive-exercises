@@ -148,7 +148,13 @@ async def run_agent_loop(history, session):
             tool_input = decision["tool_input"]
 
             try:
-                tool_result = await call_mcp_tool(session, tool_name, tool_input)
+                # GOAL: Execute the tool asynchronously with the provided tool inputs.
+                # YOUR TASK: Execute the tool asynchronously providing 1) session,
+                # 2) tool_name and 3) tool_input as arguments. Store the returned
+                # response in a variable called tool_result.
+                # --->
+                tool_result = await () # YOUR CODE HERE
+                # <---  
             except Exception as e:
                 print_agent_response(f"Tool execution failed: {e}")
                 history.pop()
@@ -196,7 +202,9 @@ async def main():
 
     history = [{"role": "system", "content": SYSTEM_PROMPT}]
 
-    # Connect to the MCP server via streamable http
+    # Connect to the MCP server via streamable http.
+    # Note that await streamable_http_client returns a triplet
+    # (read_stream, write_strea, extra_value)
     async with streamable_http_client(MCP_SERVER_URL) as (
         read_stream,
         write_stream,
