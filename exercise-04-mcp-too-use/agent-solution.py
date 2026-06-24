@@ -70,7 +70,7 @@ def call_model(messages):
     response = client.chat.completions.create(
         model=FOUNDRY_MODEL,
         messages=messages,
-        temperature=0.2,
+        #temperature=0.2, # This parameter is not supported by gpt-5-nano
         response_format={"type": "json_object"},
     )
     content = response.choices[0].message.content
