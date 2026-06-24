@@ -41,14 +41,16 @@ def call_model(user_goal: str) -> dict[str, Any]:
         "Authorization": f"Bearer {FOUNDRY_API_KEY}",
     }
 
+    # Hint: Certain types of "reasoning models" do not support all standard payload parameters.
+    # More info: https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/reasoning
     payload = {
         "model": FOUNDRY_MODEL,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": f"My goal is: {user_goal}"},
         ],
-        "temperature": 0.2,
-        "max_tokens": 700,
+        # "temperature": 1, # This parameter is not supported by gpt-5-nano
+        # "max_tokens": 700, # This parameter is not supported by gpt-5-nano
         "response_format": {"type": "json_object"},
     }
 
