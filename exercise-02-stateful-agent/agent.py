@@ -44,10 +44,13 @@ Rules:
 
 
 def call_model(messages):
+    
+    # Hint: Certain types of "reasoning models" do not support all standard payload parameters.
+    # More info: https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/reasoning
     response = client.chat.completions.create(
         model=FOUNDRY_MODEL,
         messages=messages,
-        temperature=0.2,
+        #temperature=0.2, # This parameter is not supported by gpt-5-nano
         response_format={"type": "json_object"},
     )
 
